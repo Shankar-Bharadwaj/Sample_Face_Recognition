@@ -1,0 +1,7 @@
+flask
+numpy
+tensorflow
+pillow
+pickle
+os
+sklearn
