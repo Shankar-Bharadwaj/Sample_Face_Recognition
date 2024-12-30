@@ -1,3 +1,4 @@
 static/*
 model/embedding_model.h5
 model/embedding_model.weights.h5
+venv/
