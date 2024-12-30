@@ -1,0 +1,5 @@
+images-readme/
+venv/
+.git/
+.gitignore
+*.md
