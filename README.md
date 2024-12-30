@@ -1,4 +1,4 @@
-# Flask Application Deployment on AWS EC2
+# A. Flask Application Deployment on AWS EC2
 
 This guide outlines the steps to deploy a Flask application on an AWS EC2 instance with Gunicorn and Nginx.
 
@@ -154,3 +154,65 @@ gunicorn --bind 0.0.0.0:5000 app:app
 ```
 
 Your application is now production-ready and accessible via your EC2 instance's public IP on port 80, that is, `http://<EC2-Public-IP>/`.
+<br />
+<br />
+
+# B. Flask Application Deployment on AWS ECS Fargate
+
+This guide outlines the steps to deploy a Flask application on **AWS ECS (Elastic Container Service) Fargate.**
+
+## Step 1: Build a Python Web App using Flask
+
+1. Create a Flask application in your local machine and add the required dependencies to `requirements.txt`.
+2. Test the app locally,
+```
+python3 app.py
+```
+
+## Step 2: Dockerize the Application
+
+1. Create a `Dockerfile` to containerize the application.
+2. The `Dockerfile` includes information such as the base images, requirements.txt, application code, appropriate ports, and the command to run the application.
+3. Install **Docker desktop** on your local machine to access the Docker CLI and build the Docker Image using the following command,
+```
+docker build -t image-name .
+```
+4. Push the Image to Docker Hub using,
+```
+docker push profile_username/image-name
+```
+
+## Step 3: Set Up AWS ECS Fargate
+
+1. Create ECS Cluster
+   - Navigate to the ECS dashboard in AWS Console.
+   - Create a new cluster for the project.
+2. Define Task Definition
+   - Provide key configuration details like Task CPU, Task Memory, Docker Image (profile_username/image-name), Port Mappings (for eg., 8080:8080), App protocol (for eg., HTTP).
+3. Create Security Groups
+   - Create a security group to allow specific inbound and outbound traffic according to the purpose of your application.
+
+## Step 4: Create an ECS Fargate Service
+
+1. Create an ECS service within the cluster with **'Fargate'** as the launch type and the task definition as the task family defined above.
+2. Specify the number of instances to be created of your container under **Desired tasks**.
+3. After successful creation, the service is deployed. The ECS Fargate service is set up with the image from Docker Hub.
+
+## Step 5: Test the Deployment
+
+1. Verify the task is running
+   - Check if the task is running properly in the ECS console under the **'Tasks'** tab.
+2. Open the Application
+   - Once the task is running, you can access the application in the browser using `http://<public-ip>:8080`.
+
+## Common Errors and Troubleshooting
+
+1. **Error:"The sum of the container CPU must not exceed the task CPU"**
+   - This occurs when the sum of allocated vCPU for containers exceeds the vCPU for the task.
+   - Adjust the container CPU to be less than or equal to the task CPU.
+2. **Error: "Error occurred during operation 'CreateCluster SDK error: Service Unavailable"**
+   - This can happen due to temporary issues with AWS services.
+   - Retry the operation after some time.
+3. **Error: "CannotPullContainerError: Image manifest does not contain descriptor matching platform"**
+   - The error indicates that the ECS instance cannot pull the image due to mismatched architecture.
+   - Ensure the image architecture matches the ECS task's configuration. The image's architecture can be viewed under 'Tags' in Docker Hub.
